@@ -3,4 +3,6 @@ import GreeterInterface from "./artifacts/src/Greeter.sol/GreeterInterface.json"
 
 import Storage from "./artifacts/src/Storage.sol/Storage.json";
 
-export { Greeter, GreeterInterface, Storage };
+import { Greeter__factory } from "./types";
+
+export { Greeter, GreeterInterface, Storage, Greeter__factory };

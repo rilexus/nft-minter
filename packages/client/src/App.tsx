@@ -1,4 +1,4 @@
-import React, { CSSProperties, useMemo, useState } from "react";
+import React, { useState } from "react";
 import { ThemeProvider } from "@nightfall-ui/theme";
 import { ChainSelect, DropArea, FilePreview } from "@components";
 import { PINATA_API_KEY, PINATA_SECRET_API_KEY } from "@env";
@@ -12,7 +12,6 @@ import {
   withGreeter,
 } from "./providers/GreeterProvider/GreeterProvider";
 import { useWeb3 } from "./utils/use-web3";
-import { createHmac } from "crypto";
 import base64url from "base64url";
 
 config({

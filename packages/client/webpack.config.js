@@ -2,7 +2,7 @@ const path = require("path");
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { EnvironmentPlugin, ProvidePlugin } = require("webpack");
-require("dotenv").config();
+require("dotenv").config({ path: "../../.env" });
 
 const BUILD_FOLDER = "docs";
 
