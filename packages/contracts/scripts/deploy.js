@@ -25,12 +25,19 @@ async function deploy(contracts) {
   // manually to make sure everything is compiled
   await hre.run("compile");
 
+  const [deployer] = await ethers.getSigners(); //get the account to deploy the contract
+
+  console.log("Deploying contracts with the account:", deployer.address);
+
   const instances = [];
   for await (const contract of contracts) {
     // We get the contract to deploy
     const Contract = await ethers.getContractFactory(contract.name);
     const instance = await Contract.deploy(...contract.args);
     await instance.deployed();
+    console.log(`Deployed: ${contract.name}`);
+    console.log(`Address: ${instance.address}`);
+    console.log("===================");
     instances.push({
       name: contract.name,
       instance,
@@ -52,12 +59,12 @@ async function deploy(contracts) {
       //   "GreeterInterface",
       //   greeter.address
       // );
-      // const greeting = await greeter.greet();
-      // console.log(greeting);
+      const greeting = await greeter.greet();
+      console.log(greeting);
 
-      await greeter.setValue(42);
-      const value = await greeter.getValue();
-      console.log(value);
+      // await greeter.setValue(42);
+      // const value = await greeter.getValue();
+      // console.log(value);
 
       process.exit(0);
     })

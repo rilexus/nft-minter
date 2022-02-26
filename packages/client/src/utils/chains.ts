@@ -6,14 +6,14 @@ const CHAINS: {
     name: string;
   };
 } = {
-  1: {
-    urls: [
-      INFURA_PROJECT_KEY
-        ? `https://mainnet.infura.io/v3/${INFURA_PROJECT_KEY}`
-        : undefined,
-    ].filter((url) => url !== undefined) as string[],
-    name: "Mainnet",
-  },
+  // 1: {
+  //   urls: [
+  //     INFURA_PROJECT_KEY
+  //       ? `https://mainnet.infura.io/v3/${INFURA_PROJECT_KEY}`
+  //       : undefined,
+  //   ].filter((url) => url !== undefined) as string[],
+  //   name: "Mainnet",
+  // },
   3: {
     urls: [
       INFURA_PROJECT_KEY
@@ -34,16 +34,6 @@ const CHAINS: {
     urls: ["http://localhost:8545"],
     name: "Localhost",
   },
-  // Polygon
-  // 137: {
-  //     urls: [
-  //         INFURA_PROJECT_KEY ? `https://polygon-mainnet.infura.io/v3/${INFURA_PROJECT_KEY}` : undefined,
-  //         'https://polygon-rpc.com',
-  //     ].filter((url) => url !== undefined),
-  //     name: 'Polygon Mainnet',
-  //     nativeCurrency: MATIC,
-  //     blockExplorerUrls: ['https://polygonscan.com'],
-  // },
 };
 
 const URLS: { [chainId: number]: string[] } = Object.keys(CHAINS).reduce<{

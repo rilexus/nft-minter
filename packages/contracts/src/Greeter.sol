@@ -33,8 +33,9 @@ contract Greeter {
         greet();
     }
 
-    function setGreeting(string memory _greeting) public {
+    function setGreeting(string memory _greeting) public payable {
         console.log("Changing greeting from '%s' to '%s'", greeting, _greeting);
         greeting = _greeting;
+        console.log("Changing greeting from '%s'", greeting);
     }
 }

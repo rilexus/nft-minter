@@ -47,6 +47,7 @@ module.exports = ({ development, production }) => {
     },
     resolve: {
       fallback: {
+        path: require.resolve("path-browserify"),
         stream: require.resolve("stream-browserify"),
         os: require.resolve("os-browserify/browser"),
         https: require.resolve("https-browserify"),
