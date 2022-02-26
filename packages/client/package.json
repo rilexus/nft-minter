@@ -5,12 +5,8 @@
   "scripts": {
     "clean": "npx hardhat clean",
     "start:frontend": "webpack serve --config webpack.config.js --env development",
-    "start:node": "npx hardhat node",
     "start": "run-p start:frontend",
-    "build:contracts": "npx hardhat compile",
-    "deploy:localhost": "hardhat run scripts/deploy.js --network localhost",
-    "deploy:rinkeby": "hardhat run scripts/deploy.js --network rinkeby",
-    "build": "run-p build:frontend build:contracts"
+    "build": "webpack --config webpack.config.js --env production"
   },
   "dependencies": {
     "@nft-minter/contracts": "*",

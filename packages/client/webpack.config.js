@@ -4,7 +4,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { EnvironmentPlugin, ProvidePlugin } = require("webpack");
 require("dotenv").config({ path: "../../.env" });
 
-const BUILD_FOLDER = "docs";
+const BUILD_FOLDER = "dist";
 
 const getENV = () => {
   return Object.entries(process.env).reduce((e, [key, value]) => {
@@ -20,13 +20,18 @@ const getENV = () => {
 };
 
 module.exports = ({ development, production }) => {
+  const mode = development ? "development" : "production";
+
   const env = getENV();
   console.log("ENV");
   console.log("========");
   console.log(env);
+  console.log("MODE:");
+  console.log("========");
+  console.log(mode);
   return {
     entry: ["@babel/polyfill", "./src/index.tsx"],
-    mode: "development",
+    mode,
     module: {
       rules: [
         {
