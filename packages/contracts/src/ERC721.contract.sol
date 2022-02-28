@@ -40,14 +40,6 @@ contract ERC721 {
         // called after every mint
     }
 
-    function _ownerOf(uint256 _tokenId) internal view returns(address) {
-        address owner = Storage.getOwner(_tokenId);
-
-        require(!owner.isZeroAddress(), "ERC721: token does not exist!");
-
-        return owner;
-    }
-
     function _exists(uint256 _tokenId) internal view returns (bool) {
         return Storage.getOwner(_tokenId) != address(0);
     }

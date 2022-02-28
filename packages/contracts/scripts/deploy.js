@@ -8,8 +8,8 @@ const ethers = hre.ethers;
 
 const contracts = [
   {
-    name: "Greeter",
-    args: ["some"],
+    name: "Minter",
+    args: ["Minter", "MTR"],
   },
 ];
 
@@ -51,21 +51,12 @@ async function deploy(contracts) {
   const c = await getContracts();
   deploy(c)
     .then(async (contracts) => {
-      const greeter = contracts.find(({ name }) => name === "Greeter").instance;
-      /*
-        can use a different interface for a contract on specific address
-      */
+      // can use a different interface for a contract on specific address
+      // const greeter = contracts.find(({ name }) => name === "Greeter").instance;
       // const greeter = await ethers.getContractAt(
       //   "GreeterInterface",
       //   greeter.address
       // );
-      const greeting = await greeter.greet();
-      console.log(greeting);
-
-      // await greeter.setValue(42);
-      // const value = await greeter.getValue();
-      // console.log(value);
-
       process.exit(0);
     })
     .catch((error) => {
