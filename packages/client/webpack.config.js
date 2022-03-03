@@ -1,7 +1,12 @@
+//eslint-disable-next-line
 const path = require("path");
+//eslint-disable-next-line
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
+//eslint-disable-next-line
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+//eslint-disable-next-line
 const { EnvironmentPlugin, ProvidePlugin } = require("webpack");
+//eslint-disable-next-line
 require("dotenv").config({ path: "../../.env" });
 
 const BUILD_FOLDER = "dist";
@@ -61,6 +66,8 @@ module.exports = ({ development, production }) => {
         assert: require.resolve("assert/"),
       },
       alias: {
+        "@hooks": path.resolve(__dirname, "src/hooks"),
+        "@hooks/": path.resolve(__dirname, "src/hooks/"),
         "@env": path.resolve(__dirname, "src/env.ts"),
         "@libs": path.resolve(__dirname, "src/libs"),
         "@libs/": path.resolve(__dirname, "src/libs/"),

@@ -7,6 +7,8 @@
       "esnext"
     ],
     "paths": {
+      "@hooks": ["hooks"],
+      "@hooks/*": ["hooks/*"],
       "@env": ["env.ts"],
       "@libs": ["libs"],
       "@libs/*": ["libs/*"],

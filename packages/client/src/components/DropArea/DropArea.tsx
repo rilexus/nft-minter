@@ -1,78 +1,171 @@
-import React, { CSSProperties, forwardRef, useState } from "react";
+import React, {
+  CSSProperties,
+  forwardRef,
+  HTMLAttributes,
+  useRef,
+  useState,
+} from "react";
 import { TextCenter } from "../TextCenter";
 import { UploadIcon } from "@icons";
 import { useCSSProperties } from "@nightfall-ui/hooks";
 import { BodyRegular, Title2 } from "@nightfall-ui/typography";
+import { useDragAndDrop } from "@hooks";
+import { mergeRefs } from "@nightfall-ui/utils";
+import { FilePreview } from "@components/DropArea/components";
+import { CloseFilled } from "@nightfall-ui/icons";
+
+const require = (condition: boolean, callback: () => void) => {
+  if (condition) {
+    callback();
+  }
+};
 
 const DropArea = forwardRef<
-  HTMLDivElement,
-  {
-    loading?: boolean;
+  HTMLInputElement,
+  HTMLAttributes<HTMLInputElement> & {
     width?: string;
     height?: string;
     style?: CSSProperties;
-    onDrop: (e: React.DragEvent<HTMLDivElement>) => void;
+    onDrop?: (files: { dataTransfer?: { files: FileList } }) => void;
   }
->(function DropArea({ style, onDrop }, outsideRef) {
+>(function DropArea({ style, onDrop, ...props }, outsideRef) {
   const [over, setOver] = useState(false);
+  const inputRef = useRef<any>(null);
+  const [highlight, setHighlight] = useState(false);
+  const [files, setFiles] = useState<any>(null); // TODO: add types
 
   const s = useCSSProperties(
     {
-      transition: "border 200ms ease 0ms",
-      border: `3px dashed ${over ? "blue" : "gray"}`,
+      transition: "border 250ms ease 0ms, transform 250ms ease 0ms",
+      border: `3px dashed ${over || highlight ? "white" : "gray"}`,
       borderRadius: "2rem",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      padding: "2rem",
+      transformOrigin: "50% 50%",
+      cursor: !!files ? "default" : "pointer",
+      transform: `scale(${over || highlight ? 1.02 : 1})`,
+      overflow: "hidden",
       ...style,
     },
-    [style, over]
+    [style, over, highlight, files]
   );
 
-  //TODO: memo event handlers
+  const dragAndDropRef = useDragAndDrop((e: any) => {
+    const { type } = e;
+    switch (type) {
+      case "drop": {
+        e.preventDefault();
+        onDrop?.(e);
+        setOver(false);
+        return;
+      }
+      case "dragleave": {
+        setOver(false);
+        return;
+      }
+      case "dragenter": {
+        setOver(true);
+        return;
+      }
+      case "dragover": {
+        e.preventDefault();
+        return;
+      }
+      default: {
+        return;
+      }
+    }
+  });
+
+  const reset = () => {
+    inputRef.current.value = "";
+    setFiles(null);
+  };
+
   return (
     <div
-      style={s}
+      ref={dragAndDropRef}
+      style={{
+        padding: "1rem",
+        display: "inline-block",
+        position: "relative",
+      }}
+      onMouseEnter={() => {
+        setHighlight(true);
+      }}
+      onMouseLeave={() => {
+        setHighlight(false);
+      }}
+      onClick={() => {
+        require(!files, () => {
+          reset();
+          inputRef.current?.click();
+        });
+      }}
       onDrop={(e) => {
-        e.preventDefault();
-        onDrop(e);
-        setOver(false);
-      }}
-      onDragEnter={() => {
-        setOver(true);
-      }}
-      onDragLeave={() => {
-        setOver(false);
-      }}
-      onDragOver={(e) => {
-        e.preventDefault();
+        const dataTransfer = e.dataTransfer;
+        setFiles(dataTransfer.files);
       }}
     >
-      <div
-        ref={outsideRef}
-        style={{
-          pointerEvents: "none",
-        }}
-      >
-        <TextCenter>
-          <Title2 type={"primary"} weight={"bold"}>
-            Upload
-          </Title2>
-          <UploadIcon fill={"gray"} width={"50px"} height={"50px"} />
-          <BodyRegular type={"secondary"}>Drag & Drop</BodyRegular>
-        </TextCenter>
+      <div style={s}>
+        <div>
+          {!files && (
+            <TextCenter>
+              <div
+                style={{
+                  margin: "2rem",
+                  pointerEvents: "none",
+                }}
+              >
+                <Title2 type={"primary"} weight={"bold"}>
+                  File
+                </Title2>
+                <UploadIcon fill={"gray"} width={"50px"} height={"50px"} />
+                <BodyRegular type={"secondary"}>Drop or Click</BodyRegular>
+              </div>
+            </TextCenter>
+          )}
+
+          {files && (
+            <FilePreview
+              file={files[0]}
+              style={{
+                width: "100%",
+              }}
+            />
+          )}
+        </div>
       </div>
-      <form>
-        <input
-          type="file"
-          id={"files"}
-          // onChange={handleChange}
+      {files && highlight && (
+        <button
+          onClick={reset}
           style={{
-            display: "none",
+            position: "absolute",
+            top: "0rem",
+            right: "-0.5rem",
+            cursor: "pointer",
+            outline: "none",
+            backgroundColor: "transparent",
+            border: "none",
           }}
-        />
-      </form>
+        >
+          <CloseFilled fill={"red"} height={"1.4rem"} width={"1.4rem"} />
+        </button>
+      )}
+      <input
+        {...props}
+        type="file"
+        id={"files"}
+        onChange={(e) => {
+          setFiles(e.target.files);
+          props.onChange?.(e);
+        }}
+        ref={mergeRefs([outsideRef, inputRef])}
+        style={{
+          display: "none",
+        }}
+      />
     </div>
   );
 });

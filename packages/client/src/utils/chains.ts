@@ -7,32 +7,32 @@ const CHAINS: {
   };
 } = {
   // 1: {
+  //   name: "Mainnet",
   //   urls: [
   //     INFURA_PROJECT_KEY
   //       ? `https://mainnet.infura.io/v3/${INFURA_PROJECT_KEY}`
   //       : undefined,
   //   ].filter((url) => url !== undefined) as string[],
-  //   name: "Mainnet",
   // },
   3: {
+    name: "Ropsten",
     urls: [
       INFURA_PROJECT_KEY
         ? `https://ropsten.infura.io/v3/${INFURA_PROJECT_KEY}`
         : undefined,
     ].filter((url) => url !== undefined) as string[],
-    name: "Ropsten",
   },
   4: {
+    name: "Rinkeby",
     urls: [
       INFURA_PROJECT_KEY
         ? `https://rinkeby.infura.io/v3/${INFURA_PROJECT_KEY}`
         : undefined,
     ].filter((url) => url !== undefined) as string[],
-    name: "Rinkeby",
   },
   1337: {
-    urls: ["http://localhost:8545"],
     name: "Localhost",
+    urls: ["http://localhost:8545"],
   },
 };
 
