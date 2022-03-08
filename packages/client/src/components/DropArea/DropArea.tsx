@@ -25,10 +25,11 @@ const DropArea = forwardRef<
   HTMLAttributes<HTMLInputElement> & {
     width?: string;
     height?: string;
+    accept?: string;
     style?: CSSProperties;
     onDrop?: (files: { dataTransfer?: { files: FileList } }) => void;
   }
->(function DropArea({ style, onDrop, ...props }, outsideRef) {
+>(function DropArea({ style, onDrop, children, ...props }, outsideRef) {
   const [over, setOver] = useState(false);
   const inputRef = useRef<any>(null);
   const [highlight, setHighlight] = useState(false);
@@ -166,6 +167,7 @@ const DropArea = forwardRef<
           display: "none",
         }}
       />
+      {children}
     </div>
   );
 });

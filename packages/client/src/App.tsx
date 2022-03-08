@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ThemeProvider } from "@nightfall-ui/theme";
 import { ChainSelect, DropArea, PageCenter } from "@components";
-import { PINATA_API_KEY, PINATA_SECRET_API_KEY } from "@env";
+import { IPFS_GATEWAY, PINATA_API_KEY, PINATA_SECRET_API_KEY } from "@env";
 import { config, usePinata } from "@libs";
 import { Spinner } from "@icons";
 import { Button } from "@nightfall-ui/buttons";
@@ -10,10 +10,11 @@ import {
   DialogProvider,
 } from "@nightfall-ui/dialog";
 import { useWeb3 } from "./utils/use-web3";
-import { useInput } from "@hooks";
 import { MinterProvider } from "./providers/MinterProvider";
 import { Input, TextArea } from "@nightfall-ui/inputs";
 import { useForm } from "react-hook-form";
+import { v4 as uuid } from "uuid";
+import { usePromise } from "@hooks";
 
 config({
   key: PINATA_API_KEY as string,
@@ -25,29 +26,65 @@ const ConnectButton = () => {
   return <Button onClick={activate}>Connect</Button>;
 };
 
+const IPFS_GATEWAY_URI = IPFS_GATEWAY;
+
+const useNFT = (): [
+  (...args: any) => any,
+  {
+    loading: boolean;
+    data: any;
+    error: any;
+  }
+] => {
+  const { pinFile, pinJson } = usePinata();
+
+  const [create, rest] = usePromise(
+    async (data: { name: string; description: string; file: File }) => {
+      const { file, name, description } = data;
+
+      // 1. upload file to IPFS
+      const {
+        // if isDuplicate is true, pinJson throws an error: upload json in any way
+        data: { isDuplicate, ...imageData },
+        error,
+      } = await pinFile(file);
+      if (!error) {
+        // const { IpfsHash, PinSize, Timestamp } = data;
+        const id = uuid();
+        // random id as the name of the json. this will be displayed in the pinata dashboard
+        // spread file info to pinata metadata so it
+        const metadata = { name: `${id}.json`, ...imageData };
+
+        const json = {
+          // 2. create json object with IpfsHash of the file, name, description, image url
+          ...imageData,
+          name,
+          createdAt: imageData.Timestamp,
+          description,
+          image: `${IPFS_GATEWAY_URI}/${imageData.IpfsHash}`,
+        };
+        // 3. upload json to IPFS
+        const { data } = await pinJson(json, metadata);
+        // return IpfsHash of the json
+        return data.IpfsHash;
+        //
+      }
+    }
+  );
+
+  return [create, rest];
+};
+
 const App = function App() {
-  const { add, loading, file } = usePinata();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const input = useInput("greeting");
 
-  console.log(errors);
+  const [create, { loading, error, data }] = useNFT();
 
   const { active, connected } = useWeb3();
-
-  const handleDrop = (e: any) => {
-    const dt = e.dataTransfer;
-    const files = dt?.files;
-    if (files) {
-      add(files.item(0));
-    }
-  };
-  const call = async () => {
-    //
-  };
 
   const [selectedChainId, setChainId] = useState<any>("1337");
 
@@ -55,9 +92,14 @@ const App = function App() {
     setChainId(value);
   };
 
-  const onSubmit = () => {
-    //
+  const onSubmit = async (e: any) => {
+    const { files, name, description } = e;
+    await create({ file: files[0], name, description });
   };
+
+  const filesRegister = register("files", {
+    required: "A file is required.",
+  });
 
   return (
     <ThemeProvider>
@@ -66,14 +108,6 @@ const App = function App() {
           <MinterProvider>
             <PageCenter>
               <div>
-                <Button onClick={call}>Call</Button>
-                <input
-                  type="text"
-                  {...input}
-                  style={{
-                    color: "black",
-                  }}
-                />
                 <ChainSelect
                   // eslint-disable-next-line
                   //@ts-ignore
@@ -85,26 +119,30 @@ const App = function App() {
                 <form onSubmit={handleSubmit(onSubmit)}>
                   <div>
                     <Input
+                      invalid={!!errors["name"]}
                       variant={"outlined"}
                       placeholder={"Name"}
-                      {...register("name", { required: true, maxLength: 200 })}
+                      {...register("name", {
+                        required: "Name is required.",
+                        maxLength: 200,
+                      })}
                     />
                   </div>
                   <div>
                     <TextArea
+                      invalid={!!errors["description"]}
                       placeholder={"Description"}
                       {...register("description", {
-                        required: true,
+                        required: "Description is required.",
                         maxLength: 1000,
                       })}
                     />
                   </div>
                   <div>
-                    {!loading && !file && (
+                    {!loading && !data && (
                       <DropArea
-                        {...register("files", {
-                          required: true,
-                        })}
+                        accept={".jpg,.png,.jpeg,.txt"}
+                        {...filesRegister}
                         style={{
                           width: "188px",
                         }}

@@ -18,5 +18,5 @@ const requestAccounts = async () => {
     return true;
   }
 };
-
+export * from "./fetch";
 export { isImageType, requestAccounts };
