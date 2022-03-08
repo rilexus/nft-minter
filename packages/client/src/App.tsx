@@ -1,6 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, {
+  forwardRef,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { ThemeProvider } from "@nightfall-ui/theme";
-import { ChainSelect, DropArea, PageCenter } from "@components";
+import {
+  ChainSelect,
+  DropArea,
+  OutlineGlowAnimation,
+  PageCenter,
+} from "@components";
 import { IPFS_GATEWAY, PINATA_API_KEY, PINATA_SECRET_API_KEY } from "@env";
 import { config, usePinata } from "@libs";
 import { Spinner } from "@icons";
@@ -21,10 +32,15 @@ config({
   secret: PINATA_SECRET_API_KEY as string,
 });
 
-const ConnectButton = () => {
+const ConnectButton = forwardRef(function ConnectButton(props, ref: any) {
   const { activate } = useWeb3();
-  return <Button onClick={activate}>Connect</Button>;
-};
+
+  return (
+    <Button ref={ref} onClick={activate}>
+      Connect
+    </Button>
+  );
+});
 
 const IPFS_GATEWAY_URI = IPFS_GATEWAY;
 
@@ -100,7 +116,7 @@ const App = function App() {
   const filesRegister = register("files", {
     required: "A file is required.",
   });
-
+  const [animate, setAnimate] = useState(false);
   return (
     <ThemeProvider>
       <DialogProvider>
@@ -108,35 +124,41 @@ const App = function App() {
           <MinterProvider>
             <PageCenter>
               <div>
+                <button onClick={() => setAnimate((s) => !s)}>animate</button>
                 <ChainSelect
                   // eslint-disable-next-line
                   //@ts-ignore
                   value={selectedChainId}
                   onChange={onSelect}
                 />
+
                 {!active && <ConnectButton />}
                 {loading && <Spinner />}
                 <form onSubmit={handleSubmit(onSubmit)}>
                   <div>
-                    <Input
-                      invalid={!!errors["name"]}
-                      variant={"outlined"}
-                      placeholder={"Name"}
-                      {...register("name", {
-                        required: "Name is required.",
-                        maxLength: 200,
-                      })}
-                    />
+                    <OutlineGlowAnimation in={animate}>
+                      <Input
+                        invalid={!!errors["name"]}
+                        variant={"outlined"}
+                        placeholder={"Name"}
+                        {...register("name", {
+                          required: "Name is required.",
+                          maxLength: 200,
+                        })}
+                      />
+                    </OutlineGlowAnimation>
                   </div>
                   <div>
-                    <TextArea
-                      invalid={!!errors["description"]}
-                      placeholder={"Description"}
-                      {...register("description", {
-                        required: "Description is required.",
-                        maxLength: 1000,
-                      })}
-                    />
+                    <OutlineGlowAnimation in={animate} timeout={700}>
+                      <TextArea
+                        invalid={!!errors["description"]}
+                        placeholder={"Description"}
+                        {...register("description", {
+                          required: "Description is required.",
+                          maxLength: 1000,
+                        })}
+                      />
+                    </OutlineGlowAnimation>
                   </div>
                   <div>
                     {!loading && !data && (
