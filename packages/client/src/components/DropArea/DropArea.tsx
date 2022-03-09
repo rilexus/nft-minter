@@ -47,9 +47,9 @@ const DropArea = forwardRef<
       cursor: !!files ? "default" : "pointer",
       transform: `scale(${over || highlight ? 1.02 : 1})`,
       overflow: "hidden",
-      ...style,
+      height: "100%",
     },
-    [style, over, highlight, files]
+    [over, highlight, files]
   );
 
   const dragAndDropRef = useDragAndDrop((e: any) => {
@@ -89,8 +89,8 @@ const DropArea = forwardRef<
       ref={dragAndDropRef}
       style={{
         padding: "1rem",
-        display: "inline-block",
         position: "relative",
+        ...style,
       }}
       onMouseEnter={() => {
         setHighlight(true);
@@ -110,48 +110,52 @@ const DropArea = forwardRef<
       }}
     >
       <div style={s}>
-        <div>
-          {!files && (
-            <TextCenter>
-              <div
-                style={{
-                  margin: "2rem",
-                  pointerEvents: "none",
-                }}
-              >
-                <Title2 type={"primary"} weight={"bold"}>
-                  File
-                </Title2>
-                <UploadIcon fill={"gray"} width={"50px"} height={"50px"} />
-                <BodyRegular type={"secondary"}>Drop or Click</BodyRegular>
-              </div>
-            </TextCenter>
-          )}
-
-          {files && (
-            <FilePreview
-              file={files[0]}
+        {!files && (
+          <TextCenter>
+            <div
               style={{
-                width: "100%",
+                margin: "2rem",
+                pointerEvents: "none",
               }}
-            />
-          )}
-        </div>
+            >
+              <Title2 type={"primary"} weight={"bold"}>
+                File
+              </Title2>
+              <UploadIcon fill={"gray"} width={"50px"} height={"50px"} />
+              <BodyRegular type={"secondary"}>Drop or Click</BodyRegular>
+            </div>
+          </TextCenter>
+        )}
+
+        {files && (
+          <FilePreview
+            file={files[0]}
+            style={{
+              objectFit: "cover",
+              height: `${
+                dragAndDropRef.current?.getBoundingClientRect()?.height
+              }px`,
+              width: `${
+                dragAndDropRef.current?.getBoundingClientRect()?.width
+              }px`,
+            }}
+          />
+        )}
       </div>
       {files && highlight && (
         <button
           onClick={reset}
           style={{
             position: "absolute",
-            top: "0rem",
-            right: "-0.5rem",
+            top: "-0.5rem",
+            right: "-1rem",
             cursor: "pointer",
             outline: "none",
             backgroundColor: "transparent",
             border: "none",
           }}
         >
-          <CloseFilled fill={"red"} height={"1.4rem"} width={"1.4rem"} />
+          <CloseFilled fill={"red"} height={"1.8rem"} width={"1.8rem"} />
         </button>
       )}
       <input

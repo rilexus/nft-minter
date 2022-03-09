@@ -8,6 +8,7 @@ import React, {
   useRef,
   useState,
 } from "react";
+import Web3 from "web3";
 
 const hasEthereum = () => {
   // eslint-disable-next-line
@@ -45,6 +46,10 @@ const metamask = window.ethereum;
 
 const Web3Context = createContext<any /* TODO: type this */>(null);
 const useWeb3Context = () => useContext(Web3Context);
+
+//eslint-disable-next-line
+//@ts-ignore
+const web3 = new Web3(window.ethereum);
 
 const Web3Provider: FC<{ getLibrary: () => any }> = ({
   children,
@@ -95,11 +100,14 @@ const useMessage = (callback: (...args: any) => void) => {
     const call = (...args: any) => {
       callbackRef.current(...args);
     };
-
-    metamask.addListener("chainChanged", call);
+    if (metamask) {
+      metamask.addListener("chainChanged", call);
+    }
 
     return () => {
-      metamask.removeListener("chainChanged", call);
+      if (metamask) {
+        metamask.removeListener("chainChanged", call);
+      }
     };
   }, [isMounted, callbackRef]);
 };
@@ -114,13 +122,16 @@ const useConnection = () => {
     const onDisconnect = () => {
       setConnected(false);
     };
-
-    metamask.addListener("connect", onConnect);
-    metamask.addListener("disconnect", onDisconnect);
+    if (metamask) {
+      metamask.addListener("connect", onConnect);
+      metamask.addListener("disconnect", onDisconnect);
+    }
 
     return () => {
-      metamask.removeListener("connect", onConnect);
-      metamask.removeListener("disconnect", onDisconnect);
+      if (metamask) {
+        metamask.removeListener("connect", onConnect);
+        metamask.removeListener("disconnect", onDisconnect);
+      }
     };
   }, []);
   return connected;
@@ -143,11 +154,15 @@ const useChain = () => {
       setChain(id);
     }, 500);
 
-    metamask.addListener("chainChanged", set);
+    if (metamask) {
+      metamask.addListener("chainChanged", set);
+    }
 
     return () => {
       clearTimeout(timeout);
-      metamask.removeListener("chainChanged", set);
+      if (metamask) {
+        metamask.removeListener("chainChanged", set);
+      }
     };
   }, [isMounted]);
 

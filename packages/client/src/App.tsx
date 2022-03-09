@@ -1,10 +1,4 @@
-import React, {
-  forwardRef,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { FC, forwardRef, useState } from "react";
 import { ThemeProvider } from "@nightfall-ui/theme";
 import {
   ChainSelect,
@@ -24,8 +18,12 @@ import { useWeb3 } from "./utils/use-web3";
 import { MinterProvider } from "./providers/MinterProvider";
 import { Input, TextArea } from "@nightfall-ui/inputs";
 import { useForm } from "react-hook-form";
-import { v4 as uuid } from "uuid";
-import { usePromise } from "@hooks";
+import { useNFT } from "@hooks";
+import { NftForm } from "@components/NFTForm/NFTForm";
+import { createGlobalStyle } from "styled-components";
+import { Title1 } from "@nightfall-ui/typography";
+import { Flex, Grid } from "@nightfall-ui/layout";
+import { useCSSProperties } from "@nightfall-ui/hooks";
 
 config({
   key: PINATA_API_KEY as string,
@@ -42,64 +40,17 @@ const ConnectButton = forwardRef(function ConnectButton(props, ref: any) {
   );
 });
 
-const IPFS_GATEWAY_URI = IPFS_GATEWAY;
-
-const useNFT = (): [
-  (...args: any) => any,
-  {
-    loading: boolean;
-    data: any;
-    error: any;
-  }
-] => {
-  const { pinFile, pinJson } = usePinata();
-
-  const [create, rest] = usePromise(
-    async (data: { name: string; description: string; file: File }) => {
-      const { file, name, description } = data;
-
-      // 1. upload file to IPFS
-      const {
-        // if isDuplicate is true, pinJson throws an error: upload json in any way
-        data: { isDuplicate, ...imageData },
-        error,
-      } = await pinFile(file);
-      if (!error) {
-        // const { IpfsHash, PinSize, Timestamp } = data;
-        const id = uuid();
-        // random id as the name of the json. this will be displayed in the pinata dashboard
-        // spread file info to pinata metadata so it
-        const metadata = { name: `${id}.json`, ...imageData };
-
-        const json = {
-          // 2. create json object with IpfsHash of the file, name, description, image url
-          ...imageData,
-          name,
-          createdAt: imageData.Timestamp,
-          description,
-          image: `${IPFS_GATEWAY_URI}/${imageData.IpfsHash}`,
-        };
-        // 3. upload json to IPFS
-        const { data } = await pinJson(json, metadata);
-        // return IpfsHash of the json
-        return data.IpfsHash;
-        //
-      }
-    }
+const Header: FC = ({ children }) => {
+  const style = useCSSProperties(
+    {
+      padding: "1rem 0 3rem 0",
+    },
+    []
   );
-
-  return [create, rest];
+  return <header style={style}>{children}</header>;
 };
 
 const App = function App() {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
-
-  const [create, { loading, error, data }] = useNFT();
-
   const { active, connected } = useWeb3();
 
   const [selectedChainId, setChainId] = useState<any>("1337");
@@ -108,75 +59,39 @@ const App = function App() {
     setChainId(value);
   };
 
-  const onSubmit = async (e: any) => {
-    const { files, name, description } = e;
-    await create({ file: files[0], name, description });
-  };
-
-  const filesRegister = register("files", {
-    required: "A file is required.",
-  });
-  const [animate, setAnimate] = useState(false);
   return (
     <ThemeProvider>
       <DialogProvider>
         <DialogBackgroundTransition>
           <MinterProvider>
+            <Header>
+              <PageCenter>
+                <Flex justify={"left"}>
+                  <ChainSelect
+                    // eslint-disable-next-line
+                    //@ts-ignore
+                    value={selectedChainId}
+                    onChange={onSelect}
+                  />
+
+                  {!active && <ConnectButton />}
+                </Flex>
+              </PageCenter>
+            </Header>
             <PageCenter>
               <div>
-                <button onClick={() => setAnimate((s) => !s)}>animate</button>
-                <ChainSelect
-                  // eslint-disable-next-line
-                  //@ts-ignore
-                  value={selectedChainId}
-                  onChange={onSelect}
-                />
-
-                {!active && <ConnectButton />}
-                {loading && <Spinner />}
-                <form onSubmit={handleSubmit(onSubmit)}>
-                  <div>
-                    <OutlineGlowAnimation in={animate}>
-                      <Input
-                        invalid={!!errors["name"]}
-                        variant={"outlined"}
-                        placeholder={"Name"}
-                        {...register("name", {
-                          required: "Name is required.",
-                          maxLength: 200,
-                        })}
-                      />
-                    </OutlineGlowAnimation>
-                  </div>
-                  <div>
-                    <OutlineGlowAnimation in={animate} timeout={700}>
-                      <TextArea
-                        invalid={!!errors["description"]}
-                        placeholder={"Description"}
-                        {...register("description", {
-                          required: "Description is required.",
-                          maxLength: 1000,
-                        })}
-                      />
-                    </OutlineGlowAnimation>
-                  </div>
-                  <div>
-                    {!loading && !data && (
-                      <DropArea
-                        accept={".jpg,.png,.jpeg,.txt"}
-                        {...filesRegister}
-                        style={{
-                          width: "188px",
-                        }}
-                      />
-                    )}
-                  </div>
-                  <div>
-                    <Button size={"large"} type={"submit"}>
-                      Submit
-                    </Button>
-                  </div>
-                </form>
+                <Grid>
+                  <Grid.Item small={0} medium={3} />
+                  <Grid.Item small={12} medium={6}>
+                    <div>
+                      <Title1 type={"primary"} weight={"bold"} as={"h1"}>
+                        Create NFT
+                      </Title1>
+                      <NftForm />
+                    </div>
+                  </Grid.Item>
+                  <Grid.Item small={0} medium={3} />
+                </Grid>
               </div>
             </PageCenter>
           </MinterProvider>

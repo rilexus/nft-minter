@@ -99,7 +99,7 @@ module.exports = ({ development, production }) => {
       historyApiFallback: true,
       compress: true,
       hot: true,
-      port: 3000,
+      port: 4200,
     },
 
     plugins: [

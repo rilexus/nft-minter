@@ -1,5 +1,6 @@
 import styled, { css, keyframes } from "styled-components";
 import React, {
+  CSSProperties,
   FC,
   ReactElement,
   useLayoutEffect,
@@ -71,7 +72,15 @@ const OutlineGlowAnimation: FC<{
   timeout?: number;
   delay?: number;
   ease?: string;
-}> = ({ in: _in, timeout = 1000, delay = 0, ease = "linear", children }) => {
+  style?: CSSProperties;
+}> = ({
+  style,
+  in: _in,
+  timeout = 1000,
+  delay = 0,
+  ease = "linear",
+  children,
+}) => {
   const childRef = useRef<HTMLElement>(null);
 
   const [viewBox, setViewBox] = useState("0 0 0 0");
@@ -90,7 +99,13 @@ const OutlineGlowAnimation: FC<{
   }, [childRef]);
 
   return (
-    <StyledLines animate={_in} timeout={timeout} ease={ease} delay={delay}>
+    <StyledLines
+      animate={_in}
+      timeout={timeout}
+      ease={ease}
+      delay={delay}
+      style={style}
+    >
       <div
         style={{
           pointerEvents: "none",
