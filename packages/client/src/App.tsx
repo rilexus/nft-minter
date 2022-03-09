@@ -1,14 +1,8 @@
 import React, { FC, forwardRef, useState } from "react";
 import { ThemeProvider } from "@nightfall-ui/theme";
-import {
-  ChainSelect,
-  DropArea,
-  OutlineGlowAnimation,
-  PageCenter,
-} from "@components";
-import { IPFS_GATEWAY, PINATA_API_KEY, PINATA_SECRET_API_KEY } from "@env";
-import { config, usePinata } from "@libs";
-import { Spinner } from "@icons";
+import { ChainSelect, PageCenter } from "@components";
+import { PINATA_API_KEY, PINATA_SECRET_API_KEY } from "@env";
+import { config } from "@libs";
 import { Button } from "@nightfall-ui/buttons";
 import {
   DialogBackgroundTransition,
@@ -16,11 +10,7 @@ import {
 } from "@nightfall-ui/dialog";
 import { useWeb3 } from "./utils/use-web3";
 import { MinterProvider } from "./providers/MinterProvider";
-import { Input, TextArea } from "@nightfall-ui/inputs";
-import { useForm } from "react-hook-form";
-import { useNFT } from "@hooks";
 import { NftForm } from "@components/NFTForm/NFTForm";
-import { createGlobalStyle } from "styled-components";
 import { Title1 } from "@nightfall-ui/typography";
 import { Flex, Grid } from "@nightfall-ui/layout";
 import { useCSSProperties } from "@nightfall-ui/hooks";
